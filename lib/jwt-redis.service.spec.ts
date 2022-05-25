@@ -25,8 +25,12 @@ describe('should use config.secretOrKeyProvider', () => {
     // let testPayload: string = getRandomString();
 
     beforeAll(async () => {
+        console.info(config);
         jwtRedisService = await setup(config);
     });
 
-    expect(jwtRedisService).toBeNull()
+    it('Check jwtRedisService Obj', () => {
+        expect(jwtRedisService).not.toBeNull()
+    });
+
 })
