@@ -4,6 +4,9 @@ import { JwtRedisModule } from './jwt-redis.module';
 import { JwtRedisService } from './jwt-redis.service';
 import { JwtSecretRequestType } from '@nestjs/jwt';
 
+/*
+* @see https://github.com/nestjs/jwt/blob/master/lib/jwt.service.spec.ts
+* **/
 const setup = async (config: JwtRedisModuleOptions) => {
   const module = await Test.createTestingModule({
     imports: [JwtRedisModule.register(config)]
