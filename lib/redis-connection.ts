@@ -122,12 +122,19 @@ export class RedisConnection {
 
   private _scan(pattern): any {
     return this._redis.scanStream({
-      match: `${pattern}:*`,
+      match: `${pattern}:*`
     });
   }
 
-  async createHashValues(key: string, data: { [key: string]: any }): Promise<void> {
-    const success = await this._redis.multi().hset(key, data).expire(key, 86400).exec();
+  async createHashValues(
+    key: string,
+    data: { [key: string]: any }
+  ): Promise<void> {
+    const success = await this._redis
+      .multi()
+      .hset(key, data)
+      .expire(key, 86400)
+      .exec();
     console.error(success);
   }
   async getHashValues(key: string, fields?: string | string[]): Promise<any> {

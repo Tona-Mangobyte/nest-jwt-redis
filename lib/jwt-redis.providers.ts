@@ -2,5 +2,5 @@ import { JwtRedisModuleOptions } from './interfaces/jwt-redis-module-options.int
 import { JWT_REDIS_MODULE_OPTIONS } from './jwt-redis.constants';
 
 export function createJwtRedisProvider(options: JwtRedisModuleOptions): any[] {
-    return [{ provide: JWT_REDIS_MODULE_OPTIONS, useValue: options || {} }];
+  return [{ provide: JWT_REDIS_MODULE_OPTIONS, useValue: options || {} }];
 }
