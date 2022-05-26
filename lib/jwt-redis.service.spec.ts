@@ -23,7 +23,6 @@ const config: JwtRedisModuleOptions = {
   signOptions: {
     expiresIn: '3600'
   },
-  driver: 'redis',
   redis: {
     host: '127.0.0.1',
     port: 6379,

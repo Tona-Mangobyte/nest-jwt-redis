@@ -15,17 +15,15 @@ import * as uuid from 'uuid';
 @Injectable()
 export class JwtRedisService {
   private readonly _logger = new Logger('JwtRedisService');
-  private readonly _driver: RedisProvider = null;
+  private readonly _redisProvider: RedisProvider = null;
   constructor(
     @Inject(JwtService) private readonly jwtService: JwtService,
     @Inject(JWT_REDIS_MODULE_OPTIONS)
     private readonly _options: JwtRedisModuleOptions
   ) {
     this._options.expiresTokenRefresh = this._options.expiresTokenRefresh ? this._options.expiresTokenRefresh : 1296000;
-    if (this._options.driver === 'redis') {
-      this._driver = new RedisProvider(this._options.redis);
-      RedisConnection.getInstance().setRedis(this._driver.exec());
-    }
+    this._redisProvider = new RedisProvider(this._options.redis);
+    RedisConnection.getInstance().setRedis(this._redisProvider.exec());
   }
 
   async sign(id: any, options: any, config?: JwtSignOptions): Promise<any> {
@@ -78,9 +76,7 @@ export class JwtRedisService {
     const data = JSON.stringify(session);
 
     // Set in Redis
-    if (this._options.driver === 'redis') {
-      await this._driver.create(key, data, `${signOptions.expiresIn}${this._options.expiresPrefix}`);
-    }
+    await this._redisProvider.create(key, data, `${signOptions.expiresIn}${this._options.expiresPrefix}`);
     const expiresIn = parseInt(String(signOptions.expiresIn), 10);
     return { accessToken, refreshToken, expiresIn, expiresTokenRefresh };
   }
