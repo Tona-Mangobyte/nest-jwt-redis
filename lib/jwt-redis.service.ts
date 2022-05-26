@@ -21,7 +21,9 @@ export class JwtRedisService {
     @Inject(JWT_REDIS_MODULE_OPTIONS)
     private readonly _options: JwtRedisModuleOptions
   ) {
-    this._options.expiresTokenRefresh = this._options.expiresTokenRefresh ? this._options.expiresTokenRefresh : 1296000;
+    this._options.expiresTokenRefresh = this._options.expiresTokenRefresh
+      ? this._options.expiresTokenRefresh
+      : 1296000;
     this._redisProvider = new RedisProvider(this._options.redis);
     RedisConnection.getInstance().setRedis(this._redisProvider.exec());
   }
@@ -76,7 +78,11 @@ export class JwtRedisService {
     const data = JSON.stringify(session);
 
     // Set in Redis
-    await this._redisProvider.create(key, data, `${signOptions.expiresIn}${this._options.expiresPrefix}`);
+    await this._redisProvider.create(
+      key,
+      data,
+      `${signOptions.expiresIn}${this._options.expiresPrefix}`
+    );
     const expiresIn = parseInt(String(signOptions.expiresIn), 10);
     return { accessToken, refreshToken, expiresIn, expiresTokenRefresh };
   }
