@@ -5,6 +5,8 @@ import { RedisOption } from './redis-option.interface';
 export interface JwtRedisModuleOptions extends JwtModuleOptions {
   driver?: string;
   redis?: RedisOption;
+  expiresTokenRefresh?: number;
+  expiresPrefix?: string;
 }
 
 export interface JwtRedisOptionsFactory {

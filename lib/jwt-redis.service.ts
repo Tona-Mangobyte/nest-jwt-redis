@@ -21,6 +21,7 @@ export class JwtRedisService {
     @Inject(JWT_REDIS_MODULE_OPTIONS)
     private readonly _options: JwtRedisModuleOptions
   ) {
+    this._options.expiresTokenRefresh = this._options.expiresTokenRefresh ? this._options.expiresTokenRefresh : 1296000;
     if (this._options.driver === 'redis') {
       this._driver = new RedisProvider(this._options.redis);
       RedisConnection.getInstance().setRedis(this._driver.exec());
@@ -60,14 +61,14 @@ export class JwtRedisService {
     // Sign Jwt
     let accessToken = null;
     let refreshToken = null;
-    const expiresTokenRefresh = 1296000; // 15d <=> ( 60 * 60 * 24 * 15 )/minutes
+    const expiresTokenRefresh = this._options.expiresTokenRefresh; // 15d <=> ( 60 * 60 * 24 * 15 )/minutes
     try {
       accessToken = jwt.sign(payload, secret, {
         ...signOptions,
-        expiresIn: `${signOptions.expiresIn}m`
+        expiresIn: `${signOptions.expiresIn}${this._options.expiresPrefix}`
       });
       refreshToken = jwt.sign(payload, secret, {
-        expiresIn: `${expiresTokenRefresh}m`
+        expiresIn: `${expiresTokenRefresh}${this._options.expiresPrefix}`
       });
     } catch (err) {
       throw new Error(`redis-jwt->  Error creating token ${err}`);
@@ -77,8 +78,8 @@ export class JwtRedisService {
     const data = JSON.stringify(session);
 
     // Set in Redis
-    if (this._driver) {
-      await this._driver.create(key, data, signOptions.expiresIn);
+    if (this._options.driver === 'redis') {
+      await this._driver.create(key, data, `${signOptions.expiresIn}${this._options.expiresPrefix}`);
     }
     const expiresIn = parseInt(String(signOptions.expiresIn), 10);
     return { accessToken, refreshToken, expiresIn, expiresTokenRefresh };

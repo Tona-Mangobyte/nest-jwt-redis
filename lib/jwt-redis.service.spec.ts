@@ -18,6 +18,8 @@ const config: JwtRedisModuleOptions = {
   secret: 'default_secret',
   publicKey: 'public_key',
   privateKey: 'private_key',
+  expiresPrefix: 'm',
+  expiresTokenRefresh: 8400,
   signOptions: {
     expiresIn: '3600'
   },
