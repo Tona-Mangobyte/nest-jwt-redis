@@ -2,7 +2,10 @@ import { JwtModuleOptions } from '@nestjs/jwt'
 import { ModuleMetadata, Type } from '@nestjs/common';
 import { RedisOption } from "./redis-option.interface";
 
-export interface JwtRedisModuleOptions extends JwtModuleOptions, RedisOption {}
+export interface JwtRedisModuleOptions extends JwtModuleOptions {
+    driver?: string;
+    redis?: RedisOption;
+}
 
 export interface JwtRedisOptionsFactory {
     createJwtRedisOptions(): Promise<JwtRedisModuleOptions> | JwtRedisModuleOptions;
