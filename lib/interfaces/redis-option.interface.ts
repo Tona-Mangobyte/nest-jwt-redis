@@ -1,8 +1,8 @@
 import * as jwt from 'jsonwebtoken';
 
 export interface RedisOption {
-  host?: string;
-  port?: number;
+  host: string;
+  port: number;
   password?: string;
   connectionName?: string;
   db?: number;

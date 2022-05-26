@@ -24,6 +24,7 @@ export class JwtRedisService {
     this._options.expiresTokenRefresh = this._options.expiresTokenRefresh
       ? this._options.expiresTokenRefresh
       : 1296000;
+    this._options.expiresPrefix = this._options.expiresPrefix ? this._options.expiresPrefix : 'm';
     this._redisProvider = new RedisProvider(this._options.redis);
     RedisConnection.getInstance().setRedis(this._redisProvider.exec());
   }
