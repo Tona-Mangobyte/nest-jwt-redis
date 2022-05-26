@@ -43,8 +43,15 @@ describe('should use config.secretOrKeyProvider', () => {
 
   it('Generate Token', async () => {
     const payload = { username: 'Admin@mb', email: 'admin@mango-byte.com' };
-    const token = await jwtRedisService.sign('123', payload);
-    console.info(token);
-    expect(token).not.toBeNull();
+    const userId = '123';
+    const tokenAPI = await jwtRedisService.sign(userId, payload);
+    console.info(tokenAPI);
+    expect(tokenAPI).not.toBeNull();
+    const accessToken = tokenAPI.accessToken;
+    const decode: any = await jwtRedisService.decode(accessToken);
+    expect(decode).not.toBeNull();
+    const userIdDecode = decode.rjwt.toString().split(':')[0];
+    console.info(userIdDecode);
+    expect(userIdDecode).toBe(userId);
   });
 });

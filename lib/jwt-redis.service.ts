@@ -5,7 +5,7 @@ import {
   JwtSignOptions,
   JwtVerifyOptions
 } from '@nestjs/jwt';
-import { JwtRedisModuleOptions } from './interfaces';
+import {IJwtVerifyOptions, JwtRedisModuleOptions} from './interfaces';
 import * as jwt from 'jsonwebtoken';
 import { JWT_REDIS_MODULE_OPTIONS } from './jwt-redis.constants';
 import { RedisConnection } from './redis-connection';
@@ -86,6 +86,57 @@ export class JwtRedisService {
     );
     const expiresIn = parseInt(String(signOptions.expiresIn), 10);
     return { accessToken, refreshToken, expiresIn, expiresTokenRefresh };
+  }
+
+  async verify<T extends Record<any, any> = any>(
+      token: string,
+      valueSession?: boolean,
+      options?: IJwtVerifyOptions,
+  ): Promise<any> {
+    const configOption = options ? options : this._options.verifyOptions;
+    const verifyOptions = this.mergeJwtOptions({ ...configOption }, 'verifyOptions');
+    const secret = this.getSecretKey(token, configOption, 'publicKey', JwtSecretRequestType.VERIFY);
+
+    const decode = jwt.verify(token, secret, verifyOptions) as T;
+    return this.validatePayload(decode, valueSession);
+  }
+
+  decode(token: string, options?: jwt.DecodeOptions): null | { [key: string]: any } | string {
+    return jwt.decode(token, options);
+  }
+
+  async validatePayload(decode, valueSession?: boolean): Promise<any> {
+    if (!decode) {
+      return false;
+    }
+    // get current TTL
+    // const ttl = await this._driver.ttl(key);
+    // get Id
+    const id = decode.rjwt.split(':')[0];
+
+    // Merge
+    Object.assign(decode, { id });
+
+    if (!this._redisProvider) {
+      return decode;
+    }
+    // get key in redis
+    const key = decode.rjwt;
+
+    // Verify if exits key in redis
+    if (!(await this._redisProvider.exists(key))) {
+      return false;
+    }
+
+    // if full get value from redis
+    if (valueSession) {
+      const value = JSON.parse(<string>await this._redisProvider.getValueByKey(key));
+      if (value.dataSession) {
+        Object.assign(decode, { dataSession: value.dataSession });
+      }
+    }
+
+    return decode;
   }
 
   private mergeJwtOptions(
